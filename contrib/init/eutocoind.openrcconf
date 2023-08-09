@@ -1,0 +1,33 @@
+# /etc/conf.d/eutocoind: config file for /etc/init.d/eutocoind
+
+# Config file location
+#EUTOCOIND_CONFIGFILE="/etc/eutocoin/eutocoin.conf"
+
+# What directory to write pidfile to?  (created and owned by $EUTOCOIND_USER)
+#EUTOCOIND_PIDDIR="/var/run/eutocoind"
+
+# What filename to give the pidfile
+#EUTOCOIND_PIDFILE="${EUTOCOIND_PIDDIR}/eutocoind.pid"
+
+# Where to write eutocoind data (be mindful that the blockchain is large)
+#EUTOCOIND_DATADIR="/var/lib/eutocoind"
+
+# User and group to own eutocoind process
+#EUTOCOIND_USER="eutocoin"
+#EUTOCOIND_GROUP="eutocoin"
+
+# Path to eutocoind executable
+#EUTOCOIND_BIN="/usr/bin/eutocoind"
+
+# Nice value to run eutocoind under
+#EUTOCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+#EUTOCOIND_OPTS=""
+
+# The timeout in seconds OpenRC will wait for eutocoind to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+EUTOCOIND_SIGTERM_TIMEOUT=60

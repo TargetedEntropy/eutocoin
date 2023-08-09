@@ -1,0 +1,23 @@
+FROM arm32v7/ubuntu:latest
+
+MAINTAINER cade <cade.call@mediciventures.com>
+
+EXPOSE $RPCPORT
+
+EXPOSE $PORT
+
+RUN useradd -ms /bin/bash eutocoin
+
+RUN mkdir /etc/eutocoin
+
+RUN mkdir /var/lib/eutocoin
+
+RUN chown eutocoin:eutocoin /etc/eutocoin /var/lib/eutocoin
+
+WORKDIR /home/eutocoin
+
+COPY --chown=eutocoin:eutocoin linux64/* ./run.sh /home/eutocoin/
+
+USER eutocoin
+
+CMD ["/home/eutocoin/run.sh"]

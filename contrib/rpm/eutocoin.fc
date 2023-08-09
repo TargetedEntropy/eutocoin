@@ -1,0 +1,8 @@
+/usr/bin/eutocoin-cli		--	gen_context(system_u:object_r:eutocoin_exec_t,s0)
+/usr/sbin/eutocoind		--	gen_context(system_u:object_r:eutocoin_exec_t,s0)
+/usr/lib(64)?/eutocoin/eutocoind		--	gen_context(system_u:object_r:eutocoin_exec_t,s0)
+
+/etc/eutocoin(/.*)?		gen_context(system_u:object_r:eutocoin_conf_t,s0)
+/var/lib/eutocoin(/.*)?		gen_context(system_u:object_r:eutocoin_var_lib_t,s0)
+
+(/var)?/run/eutocoind(/.*)?   gen_context(system_u:object_r:eutocoin_var_run_t,s0)

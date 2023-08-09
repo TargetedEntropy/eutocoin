@@ -1,0 +1,22 @@
+[Unit]
+Description=EutoCoin's distributed currency daemon
+After=network.target
+
+[Service]
+User=eutocoin
+Group=eutocoin
+
+Type=forking
+PIDFile=/var/lib/eutocoind/eutocoind.pid
+ExecStart=/usr/bin/eutocoind -daemon -pid=/var/lib/eutocoind/eutocoind.pid \
+-conf=/etc/eutocoin/eutocoin.conf -datadir=/var/lib/eutocoind -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

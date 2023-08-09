@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/eutocoin/.eutocoin" ]; then
+	EUTOCOIND_DEFAULT_DATADIR="/var/lib/eutocoin/.eutocoin"
+else
+	EUTOCOIND_DEFAULT_DATADIR="/var/lib/eutocoind"
+fi
+
+EUTOCOIND_CONFIGFILE=${EUTOCOIND_CONFIGFILE:-/etc/eutocoin/eutocoin.conf}
+EUTOCOIND_PIDDIR=${EUTOCOIND_PIDDIR:-/var/run/eutocoind}
+EUTOCOIND_PIDFILE=${EUTOCOIND_PIDFILE:-${EUTOCOIND_PIDDIR}/eutocoind.pid}
+EUTOCOIND_DATADIR=${EUTOCOIND_DATADIR:-${EUTOCOIND_DEFAULT_DATADIR}}
+EUTOCOIND_USER=${EUTOCOIND_USER:-${EUTOCOIN_USER:-eutocoin}}
+EUTOCOIND_GROUP=${EUTOCOIND_GROUP:-eutocoin}
+EUTOCOIND_BIN=${EUTOCOIND_BIN:-/usr/bin/eutocoind}
+EUTOCOIND_NICE=${EUTOCOIND_NICE:-${NICELEVEL:-0}}
+EUTOCOIND_OPTS="${EUTOCOIND_OPTS:-${EUTOCOIN_OPTS}}"
+
+name="EutoCoin Core Daemon"
+description="EutoCoin cryptocurrency P2P network daemon"
+
+command="/usr/bin/eutocoind"
+command_args="-pid=\"${EUTOCOIND_PIDFILE}\" \
+		-conf=\"${EUTOCOIND_CONFIGFILE}\" \
+		-datadir=\"${EUTOCOIND_DATADIR}\" \
+		-daemon \
+		${EUTOCOIND_OPTS}"
+
+required_files="${EUTOCOIND_CONFIGFILE}"
+start_stop_daemon_args="-u ${EUTOCOIND_USER} \
+			-N ${EUTOCOIND_NICE} -w 2000"
+pidfile="${EUTOCOIND_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${EUTOCOIND_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${EUTOCOIND_USER}:${EUTOCOIND_GROUP}" \
+	"${EUTOCOIND_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${EUTOCOIND_USER}:${EUTOCOIND_GROUP}" \
+	"${EUTOCOIND_PIDDIR}"
+
+	checkpath -f \
+	-o ${EUTOCOIND_USER}:${EUTOCOIND_GROUP} \
+	-m 0660 \
+	${EUTOCOIND_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${EUTOCOIND_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run eutocoind."
+		eerror "The setting must appear in ${EUTOCOIND_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following "
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"EutoCoin Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

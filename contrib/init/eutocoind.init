@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#  eutocoind The eutocoin core server.
+#
+#
+# chkconfig: 345 80 20
+# description: eutocoind
+# processname: eutocoind
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/eutocoind, see below
+if [ -f /etc/sysconfig/eutocoind ]; then
+        . /etc/sysconfig/eutocoind
+fi
+
+RETVAL=0
+
+prog=eutocoind
+# you can override the lockfile via EUTOCOIND_LOCKFILE in /etc/sysconfig/eutocoind
+lockfile=${EUTOCOIND_LOCKFILE-/var/lock/subsys/eutocoind}
+
+# eutocoind defaults to /usr/bin/eutocoind, override with EUTOCOIND_BIN
+eutocoind=${EUTOCOIND_BIN-/usr/bin/eutocoind}
+
+# eutocoind opts default to -disablewallet, override with EUTOCOIND_OPTS
+eutocoind_opts=${EUTOCOIND_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $eutocoind $eutocoind_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

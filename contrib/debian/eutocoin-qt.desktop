@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=EutoCoin Core
+Comment=Connect to the EutoCoin P2P Network
+Comment[de]=Verbinde mit dem EutoCoin peer-to-peer Netzwerk
+Comment[fr]=EutoCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=EutoCoin, eşten eşe kriptografik sanal para birimi
+Exec=eutocoin-qt %u
+Terminal=false
+Type=Application
+Icon=eutocoin128
+MimeType=x-scheme-handler/eutocoin;
+Categories=Office;Finance;
